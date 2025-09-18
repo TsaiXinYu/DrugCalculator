@@ -1,0 +1,138 @@
+{
+    "drugbank_id": "DB00254",
+    "local_id": "RBT00005",
+    "UNII_id": "N12000U13O",
+    "name": "Doxycycline",
+    "created_at": "2025-09-09T22:22:00",
+    "updated_at": "2025-09-10T00:34:00",
+    "class": "Antibiotics",
+    "subclass": [
+        "Tetracycline",
+        {
+            "Spectrum": "Broad"
+        }
+    ],
+    "pKa": [
+        3.09
+    ],
+    "indications": [
+        "Early Lyme disease",
+        "Rickettsial infections",
+        "Sexually transmitted infections",
+        "Respiratory tract infections",
+        "Ophthalmic infections",
+        "Anthrax",
+        "Trachoma",
+        "Urinary baccterial infection",
+        "Broad bacterial infection"
+    ],
+    "frequency": [
+        {
+            "PO": "q12-24h"
+        }
+    ],
+    "dosage_PO": [
+        {
+            "min": 2.5
+        },
+        {
+            "max": 4
+        }
+    ],
+    "dasage_IM": [
+        {
+            "min": "N/A"
+        },
+        {
+            "max": "N/A"
+        }
+    ],
+    "dasage_IV": [
+        {
+            "min": "N/A"
+        },
+        {
+            "max": "N/A"
+        }
+    ],
+    "dasage_SC": [
+        {
+            "min": "N/A"
+        },
+        {
+            "max": "N/A"
+        }
+    ],
+    "dosage_unit": "mg/kg",
+    "side_effect": [
+        "vomiting",
+        "diarrhea",
+        "lack of appetite",
+        "lethargy"
+    ],
+    "food_interaction": [
+        "Avoid multivalent ions",
+        "The absorption of tetracyclines is reduced when taken with foods, but not to a significant extent."
+    ],
+    "drug_interaction": [
+        {
+            "Amoxicillin": "Reduce the effectiveness of amoxicillin"
+        },
+        {
+            "Acitratin": "Increase the rick of Pseudotumor cerebri caused by increased pressure in the brain(rare)"
+        },
+        {
+            "Aminolevulinic acid": "Photosensitivity"
+        },
+        {
+            "BCG": "Reduce the anti-tumor activity of BCG in the bladder"
+        },
+        {
+            "Bexarotene": "increase the risk of pancreatitis"
+        },
+        {
+            "Digitoxin": "increase digitoxin levels"
+        },
+        {
+            "Digoxin": "increase digoxin levels"
+        },
+        {
+            "Etretinate": "increase the risk of pseudotumor cerebri caused by increased pressure in the brain (rare)"
+        },
+        {
+            "Isotretinoin": "increase the risk of pseudotumor cerebri caused by increased pressure in the brain (rare)"
+        },
+        {
+            "Ketoconazole": "increase the risk of Liver injury"
+        },
+        {
+            "Levoketoconazole": "increase the risk of Liver injury"
+        },
+        {
+            "Lomitapide": "increase the risk of Liver injury"
+        },
+        {
+            "Methoxyflurane": "increase harmfulness to the kidneys"
+        },
+        {
+            "Mipomersen": "increase the risk of Liver injury"
+        },
+        {
+            "Mycophenolic acid": "reduce systemic exposure to mycophenolic acid (MPA) products"
+        },
+        {
+            "Palovarotene": "increase the risk of pseudotumor cerebri caused by increased pressure in the brain (rare)"
+        },
+        {
+            "Pexidartinib": "increase the risk of Liver injury"
+        },
+        {
+            "Tretinoin": "increase the risk of pseudotumor cerebri caused by increased pressure in the brain (rare)"
+        },
+        {
+            "Vitamin A": "increase the risk of pseudotumor cerebri caused by increased pressure in the brain (rare)"
+        }
+    ],
+    "renal_adj": "",
+    "liver_adj": ""
+}

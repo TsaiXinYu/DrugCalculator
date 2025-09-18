@@ -1,0 +1,187 @@
+{
+    "drugbank_id": "DB09093",
+    "local_id": "RBT00004",
+    "UNII_id": "WCK1KIQ23Q",
+    "name": "Chlortetracycline",
+    "created_at": "2025-09-09T21:41:00",
+    "updated_at": "2025-09-10T00:34:00",
+    "class": "Antibiotics",
+    "subclass": [
+        "Tetracyclines",
+        {
+            "Spectrum": "Broad"
+        }
+    ],
+    "pKa": [
+        3.3,
+        7.4,
+        9.3
+    ],
+    "indications": [
+        "Pulmonary bacterial infection",
+        "Urinary bacterial infection",
+        "Skin bacterial infection"
+    ],
+    "frequency": [
+        {
+            "PO": "q24h"
+        }
+    ],
+    "dosage_PO": [
+        {
+            "min": 50
+        },
+        {
+            "max": 50
+        }
+    ],
+    "dasage_IM": [
+        {
+            "min": "N/A"
+        },
+        {
+            "max": "N/A"
+        }
+    ],
+    "dasage_IV": [
+        {
+            "min": "N/A"
+        },
+        {
+            "max": "N/A"
+        }
+    ],
+    "dasage_SC": [
+        {
+            "min": "N/A"
+        },
+        {
+            "max": "N/A"
+        }
+    ],
+    "dosage_unit": "mg/kg",
+    "side_effect": [
+        "Gastrointestinal disturbances",
+        "Staining of teeth and bone",
+        "Dental hypoplasia and bone deformity",
+        "Hepatotoxicity in pregnant woman"
+    ],
+    "food_interaction": [
+        "N/A"
+    ],
+    "drug_interaction": [
+        {
+            "Acetylcysteine": "The therapeutic efficacy of Acetylcysteine can be decreased when used in combination with Chlortetracycline."
+        },
+        {
+            "Ambroxol": "The risk or severity of methemoglobinemia can be increased when Chlortetracycline is combined with Ambroxol."
+        },
+        {
+            "Articaine": "The risk or severity of methemoglobinemia can be increased when Chlortetracycline is combined with Articaine."
+        },
+        {
+            "Benzocaine": "The risk or severity of methemoglobinemia can be increased when Chlortetracycline is combined with Benzocaine."
+        },
+        {
+            "Benzyl alcohol": "The risk or severity of methemoglobinemia can be increased when Chlortetracycline is combined with Benzyl alcohol."
+        },
+        {
+            "Bromhexine": "Bromhexine may increase the excretion rate of Chlortetracycline which could result in a lower serum level and potentially a reduction in efficacy."
+        },
+        {
+            "Bupivacaine": "The risk or severity of methemoglobinemia can be increased when Chlortetracycline is combined with Bupivacaine."
+        },
+        {
+            "Butacaine": "The risk or severity of methemoglobinemia can be increased when Chlortetracycline is combined with Butacaine."
+        },
+        {
+            "Butamben": "The risk or severity of methemoglobinemia can be increased when Chlortetracycline is combined with Butamben."
+        },
+        {
+            "Capsaicin": "The risk or severity of methemoglobinemia can be increased when Chlortetracycline is combined with Capsaicin."
+        },
+        {
+            "Chloroprocaine": "The risk or severity of methemoglobinemia can be increased when Chlortetracycline is combined with Chloroprocaine."
+        },
+        {
+            "Cinchocaine": "The risk or severity of methemoglobinemia can be increased when Chlortetracycline is combined with Cinchocaine."
+        },
+        {
+            "Cisatracurium": "Chlortetracycline may increase the neuromuscular blocking activities of Cisatracurium."
+        },
+        {
+            "Cocaine": "The risk or severity of methemoglobinemia can be increased when Chlortetracycline is combined with Cocaine."
+        },
+        {
+            "Didanosine": "Didanosine can cause a decrease in the absorption of Chlortetracycline resulting in a reduced serum concentration and potentially a decrease in efficacy."
+        },
+        {
+            "Diphenhydramine": "The risk or severity of methemoglobinemia can be increased when Chlortetracycline is combined with Diphenhydramine."
+        },
+        {
+            "Dyclonine": "The risk or severity of methemoglobinemia can be increased when Chlortetracycline is combined with Dyclonine."
+        },
+        {
+            "Estetrol": "The therapeutic efficacy of Estetrol can be decreased when used in combination with Chlortetracycline."
+        },
+        {
+            "Ethyl chloride": "The risk or severity of methemoglobinemia can be increased when Chlortetracycline is combined with Ethyl chloride."
+        },
+        {
+            "Etidocaine": "The risk or severity of methemoglobinemia can be increased when Chlortetracycline is combined with Etidocaine."
+        },
+        {
+            "Levobupivacaine": "The risk or severity of methemoglobinemia can be increased when Chlortetracycline is combined with Levobupivacaine."
+        },
+        {
+            "Lidocaine": "The risk or severity of methemoglobinemia can be increased when Chlortetracycline is combined with Lidocaine."
+        },
+        {
+            "Magnesium": "Magnesium can cause a decrease in the absorption of Chlortetracycline resulting in a reduced serum concentration and potentially a decrease in efficacy."
+        },
+        {
+            "Meloxicam": "The risk or severity of methemoglobinemia can be increased when Chlortetracycline is combined with Meloxicam."
+        },
+        {
+            "Mepivacaine": "The risk or severity of methemoglobinemia can be increased when Chlortetracycline is combined with Mepivacaine."
+        },
+        {
+            "Methoxyflurane": "The risk or severity of renal failure can be increased when Methoxyflurane is combined with Chlortetracycline."
+        },
+        {
+            "Oxetacaine": "The risk or severity of methemoglobinemia can be increased when Chlortetracycline is combined with Oxetacaine."
+        },
+        {
+            "Oxybuprocaine": "The risk or severity of methemoglobinemia can be increased when Chlortetracycline is combined with Oxybuprocaine."
+        },
+        {
+            "Palovarotene": "The risk or severity of pseudotumor cerebri can be increased when Chlortetracycline is combined with Palovarotene."
+        },
+        {
+            "Phenol": "The risk or severity of methemoglobinemia can be increased when Chlortetracycline is combined with Phenol."
+        },
+        {
+            "Pramocaine": "The risk or severity of methemoglobinemia can be increased when Chlortetracycline is combined with Pramocaine."
+        },
+        {
+            "Prilocaine": "The risk or severity of methemoglobinemia can be increased when Chlortetracycline is combined with Prilocaine."
+        },
+        {
+            "Procaine": "The risk or severity of methemoglobinemia can be increased when Chlortetracycline is combined with Procaine."
+        },
+        {
+            "Proparacaine": "The risk or severity of methemoglobinemia can be increased when Chlortetracycline is combined with Proparacaine."
+        },
+        {
+            "Propoxycaine": "The risk or severity of methemoglobinemia can be increased when Chlortetracycline is combined with Propoxycaine."
+        },
+        {
+            "Ropivacaine": "The risk or severity of methemoglobinemia can be increased when Chlortetracycline is combined with Ropivacaine."
+        },
+        {
+            "Tetracaine": "The risk or severity of methemoglobinemia can be increased when Chlortetracycline is combined with Tetracaine."
+        }
+    ],
+    "renal_adj": "",
+    "liver_adj": ""
+}

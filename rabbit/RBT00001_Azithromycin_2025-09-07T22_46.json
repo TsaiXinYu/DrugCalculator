@@ -1,0 +1,107 @@
+{
+    "drugbank_id": "DB00207",
+    "local_id": "RBT00001",
+    "UNII_id": "F94OW58Y8V",
+    "name": "Azithromycin",
+    "created_at": "2025-09-07T22:46:00",
+    "updated_at": "2025-09-10T00:33:00",
+    "class": "Antibiotics",
+    "subclass": [
+        "Macrolides",
+        {
+            "Spectrum": "Broad"
+        }
+    ],
+    "pKa": [
+        8.74
+    ],
+    "indications": [
+        "Pulmonary bacterial infection",
+        "Intestinal bacterial infection",
+        "Urinary bacterial infection",
+        "Syphilis"
+    ],
+    "frequency": [
+        {
+            "PO": "q24h x 15days"
+        },
+        {
+            "IM": "q48h x 7days"
+        },
+        {
+            "IV": "N/A"
+        },
+        {
+            "SC": "N/A"
+        }
+    ],
+    "dosage_PO": [
+        {
+            "min": 15
+        },
+        {
+            "max": 30
+        }
+    ],
+    "dasage_IM": [
+        {
+            "min": "4"
+        },
+        {
+            "max": "10"
+        }
+    ],
+    "dasage_IV": [
+        {
+            "min": "10"
+        },
+        {
+            "max": "10"
+        }
+    ],
+    "dasage_SC": [
+        {
+            "min": "N/A"
+        },
+        {
+            "max": "N/A"
+        }
+    ],
+    "dosage_unit": "mg/kg",
+    "side_effect": [
+        "Diarrhea",
+        "Vomiting",
+        "indigestion",
+        "Palpitations",
+        "Headache",
+        "Dizziness"
+    ],
+    "food_interaction": [
+        "slight"
+    ],
+    "drug_interaction": [
+        {
+            "Salmeterol": "arrhythmia"
+        },
+        {
+            "Amoxicillin": "variable efficacy"
+        },
+        {
+            "Polyethylene glycol 3350": "arrhythmia"
+        },
+        {
+            "Albuterol": "arrhythmia"
+        },
+        {
+            "Formoterol": "arrhythmia"
+        },
+        {
+            "Odensetron": "arrhythmia"
+        },
+        {
+            "Sertraline": "arrhythmia"
+        }
+    ],
+    "renal_adj": "",
+    "liver_adj": ""
+}

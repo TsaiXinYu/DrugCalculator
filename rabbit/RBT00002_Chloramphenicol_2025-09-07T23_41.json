@@ -1,0 +1,102 @@
+{
+    "drugbank_id": "DB00446",
+    "local_id": "RBT00002",
+    "UNII_id": "66974FR9Q1",
+    "name": "Chloramphenicol",
+    "created_at": "2025-09-07T23:41:00",
+    "updated_at": "2025-09-10T00:34:00",
+    "class": "Antibiotics",
+    "subclass": [
+        "Amphenicol",
+        {
+            "Spectrum": "Broad"
+        }
+    ],
+    "pKa": [
+        5.5
+    ],
+    "indications": [
+        "severe bacterial infection",
+        "Syphilis"
+    ],
+    "frequency": [
+        {
+            "PO": "q8-24h x 4wk"
+        },
+        {
+            "IM": "q8-24h x 4wk"
+        },
+        {
+            "IV": "q8-24h x 4wk"
+        },
+        {
+            "SC": "q8-24h x 4wk"
+        }
+    ],
+    "dosage_PO": [
+        {
+            "min": 30
+        },
+        {
+            "max": 55
+        }
+    ],
+    "dasage_IM": [
+        {
+            "min": "30"
+        },
+        {
+            "max": "50"
+        }
+    ],
+    "dasage_IV": [
+        {
+            "min": "30"
+        },
+        {
+            "max": "50"
+        }
+    ],
+    "dasage_SC": [
+        {
+            "min": "30"
+        },
+        {
+            "max": "50"
+        }
+    ],
+    "dosage_unit": "mg/kg",
+    "side_effect": [
+        "Aplastic anemia",
+        "Fatigue",
+        "Weakness"
+    ],
+    "food_interaction": [
+        "slight"
+    ],
+    "drug_interaction": [
+        {
+            "Sulfamethoxazole": "enhance bone marrow side effects"
+        },
+        {
+            "Amoxicillin": "reduce efficacy"
+        },
+        {
+            "Dexamethasone": "increase blood levels of Dexamethasone "
+        },
+        {
+            "Procaine Penicillin": "reduce efficacy"
+        },
+        {
+            "Penicillin V Potassium(Penicillin VK)": "reduce efficacy"
+        },
+        {
+            "Phenytoin": "increase side effects of Phenytoin"
+        },
+        {
+            "Cyanocobalamin(Vit B12)": "interfere with the treatment of anemia"
+        }
+    ],
+    "renal_adj": "",
+    "liver_adj": ""
+}

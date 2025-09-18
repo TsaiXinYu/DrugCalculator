@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>藥物資料 JSON 產生器</title>
+<style>
+  :root { --fg:#0f172a; --muted:#475569; --line:#e2e8f0; --accent:#2563eb; }
+  * { box-sizing: border-box; }
+  body { font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,Helvetica,sans-serif; color:var(--fg); margin:24px; }
+  h1 { margin: 0 0 8px; }
+  h2 { margin: 24px 0 8px; }
+  fieldset { border:1px solid var(--line); padding:16px; border-radius:12px; margin:16px 0; }
+  legend { padding:0 6px; color:var(--muted); }
+  label { display:block; font-size:14px; color:var(--muted); margin:6px 0 4px; }
+  input[type="text"], input[type="number"], input[type="datetime-local"], select, textarea {
+    width:100%; padding:10px; border:1px solid var(--line); border-radius:10px; font-size:14px;
+  }
+  .row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .row-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+  .chipbar { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+  .chip { display:flex; gap:8px; align-items:center; background:#f8fafc; border:1px solid var(--line); padding:8px; border-radius:10px; }
+  .btn { padding:10px 14px; border-radius:10px; border:1px solid var(--line); background:white; cursor:pointer; }
+  .btn.primary { background:var(--accent); color:white; border-color:var(--accent); }
+  .btn.ghost { background:#f8fafc; }
+  .btn.small { padding:6px 8px; font-size:12px; }
+  .toolbar { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .grid { display:grid; grid-template-columns:1fr; gap:12px; }
+  .flex { display:flex; gap:8px; align-items:center; }
+  .danger { color:#b91c1c }
+  #preview { width:100%; min-height:240px; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
+  hr { border:none; border-top:1px solid var(--line); margin:20px 0; }
+  .hint { font-size:12px; color:var(--muted); }
+</style>
+</head>
+<body>
+  <h1>藥物資料 JSON 產生器</h1>
+  <p class="hint">依照你的欄位格式建置，可逐項輸入、即時預覽，並下載成 <code>.json</code> 檔。</p>
+
+  <div class="toolbar">
+    <button class="btn ghost" id="loadSample">載入範例</button>
+    <button class="btn" id="clearAll">清空表單</button>
+    <button class="btn primary" id="downloadJson">下載 JSON</button>
+  </div>
+
+  <fieldset>
+    <legend>基本資訊</legend>
+    <div class="row">
+      <div>
+        <label for="drugbank_id">drugbank_id</label>
+        <input id="drugbank_id" type="text" placeholder="例如 DB00537" />
+      </div>
+      <div>
+        <label for="local_id">local_id</label>
+        <input id="local_id" type="text" placeholder="例如 RBT00003" />
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label for="UNII_id">UNII_id</label>
+        <input id="UNII_id" type="text" placeholder="例如 5E8K9I0O4U" />
+      </div>
+      <div>
+        <label for="name">name</label>
+        <input id="name" type="text" placeholder="藥品名稱，如 Ciprofloxacin" />
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label for="created_at">created_at <span class="hint">(自動轉成 YYYY-MM-DDTHH:mm:SS)</span></label>
+        <input id="created_at" type="datetime-local" />
+      </div>
+      <div>
+        <label for="updated_at">updated_at</label>
+        <input id="updated_at" type="datetime-local" />
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label for="class">class</label>
+        <input id="class" type="text" placeholder="例如 Antibiotics" />
+      </div>
+      <div>
+        <label for="dosage_unit">dosage_unit</label>
+        <input id="dosage_unit" type="text" placeholder="例如 mg/kg" />
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>subclass（可混合純文字與鍵值對）</legend>
+    <div class="chipbar" id="subclassList"></div>
+    <div class="row">
+      <div>
+        <label>項目型態</label>
+        <select id="subclassType">
+          <option value="string">純文字</option>
+          <option value="kv">鍵值對</option>
+        </select>
+      </div>
+      <div>
+        <label>值 / 或鍵名</label>
+        <input id="subclassA" type="text" placeholder="純文字值，或『鍵名』" />
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label>（鍵值對）值</label>
+        <input id="subclassB" type="text" placeholder="若為鍵值對，填『值』；純文字可留空" />
+      </div>
+      <div class="flex" style="margin-top:28px;">
+        <button class="btn" id="addSubclass">新增 subclass 項</button>
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>pKa（數值陣列）</legend>
+    <div class="chipbar" id="pkaList"></div>
+    <div class="row">
+      <div>
+        <label>pKa 數值</label>
+        <input id="pkaValue" type="number" step="0.01" placeholder="例如 6.09" />
+      </div>
+      <div class="flex" style="margin-top:28px;">
+        <button class="btn" id="addPka">新增 pKa</button>
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>indications（字串陣列）</legend>
+    <div class="chipbar" id="indicationsList"></div>
+    <div class="row">
+      <div>
+        <label>新增 indication</label>
+        <input id="indicationInput" type="text" placeholder="輸入適應症…" />
+      </div>
+      <div class="flex" style="margin-top:28px;">
+        <button class="btn" id="addIndication">新增</button>
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>frequency（路徑: 用法）</legend>
+    <div id="freqList" class="grid"></div>
+    <div class="row-3">
+      <div>
+        <label>給藥途徑</label>
+        <input id="freqRoute" type="text" placeholder="例如 PO / IM / IV / SC" />
+      </div>
+      <div>
+        <label>頻率字串</label>
+        <input id="freqValue" type="text" placeholder="例如 q24h x 4wk 或 N/A" />
+      </div>
+      <div class="flex" style="margin-top:28px;">
+        <button class="btn" id="addFreq">新增頻率</button>
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>劑量（依原始鍵名保留）</legend>
+    <div class="row">
+      <div>
+        <label>dosage_PO.min</label>
+        <input id="poMin" type="number" step="0.01" />
+      </div>
+      <div>
+        <label>dosage_PO.max</label>
+        <input id="poMax" type="number" step="0.01" />
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>dasage_IM.min（文字）</label>
+        <input id="imMin" type="text" placeholder="數值或 N/A" />
+      </div>
+      <div>
+        <label>dasage_IM.max（文字）</label>
+        <input id="imMax" type="text" placeholder="數值或 N/A" />
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>dasage_IV.min（文字）</label>
+        <input id="ivMin" type="text" placeholder="數值或 N/A" />
+      </div>
+      <div>
+        <label>dasage_IV.max（文字）</label>
+        <input id="ivMax" type="text" placeholder="數值或 N/A" />
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>dasage_SC.min（文字）</label>
+        <input id="scMin" type="text" placeholder="數值或 N/A" />
+      </div>
+      <div>
+        <label>dasage_SC.max（文字）</label>
+        <input id="scMax" type="text" placeholder="數值或 N/A" />
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>side_effect（字串陣列）</legend>
+    <div class="chipbar" id="seList"></div>
+    <div class="row">
+      <div>
+        <label>新增副作用</label>
+        <input id="seInput" type="text" placeholder="例如 Nausea" />
+      </div>
+      <div class="flex" style="margin-top:28px;">
+        <button class="btn" id="addSE">新增</button>
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>food_interaction（字串陣列）</legend>
+    <div class="chipbar" id="fiList"></div>
+    <div class="row">
+      <div>
+        <label>新增 food interaction</label>
+        <input id="fiInput" type="text" placeholder="例如 Avoid dairy products" />
+      </div>
+      <div class="flex" style="margin-top:28px;">
+        <button class="btn" id="addFI">新增</button>
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>drug_interaction（鍵值對清單）</legend>
+    <div id="diList" class="grid"></div>
+    <div class="row">
+      <div>
+        <label>藥物名稱（可留空以建立 {&quot;&quot;:&quot;&quot;}）</label>
+        <input id="diDrug" type="text" placeholder="例如 Aspirin" />
+      </div>
+      <div>
+        <label>交互作用描述</label>
+        <input id="diDesc" type="text" placeholder="例如 CNS side effects" />
+      </div>
+    </div>
+    <div class="flex" style="margin-top:8px;">
+      <button class="btn" id="addDI">新增交互作用</button>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>腎/肝功能調整</legend>
+    <div class="row">
+      <div>
+        <label for="renal_adj">renal_adj</label>
+        <input id="renal_adj" type="text" placeholder="例如 N/A 或具體建議" />
+      </div>
+      <div>
+        <label for="liver_adj">liver_adj</label>
+        <input id="liver_adj" type="text" placeholder="例如 Not recommended for patients with hepatic disease" />
+      </div>
+    </div>
+  </fieldset>
+
+  <h2>JSON 預覽</h2>
+  <textarea id="preview" readonly></textarea>
+  <p class="hint">＊每次修改表單會即時更新預覽與下載內容。</p>
+
+<script>
+/** 小工具 **/
+const $ = sel => document.querySelector(sel);
+const el = (tag, attrs={}, children=[]) => {
+  const n = document.createElement(tag);
+  Object.entries(attrs).forEach(([k,v]) => {
+    if (k === "class") n.className = v;
+    else if (k === "text") n.textContent = v;
+    else n.setAttribute(k, v);
+  });
+  children.forEach(c => n.appendChild(c));
+  return n;
+};
+const toIsoLocal = (dt) => {
+  if (!dt) return "";
+  // input type="datetime-local" 回傳 "YYYY-MM-DDTHH:mm"
+  return dt.length === 16 ? dt + ":00" : dt;
+};
+
+// 狀態容器（陣列類欄位）
+const state = {
+  subclass: [],
+  pKa: [],
+  indications: [],
+  frequency: [], // {route, value}
+  side_effect: [],
+  food_interaction: [],
+  drug_interaction: [] // {drug, desc}
+};
+
+function renderList() {
+  // subclass
+  const sc = $("#subclassList"); sc.innerHTML = "";
+  state.subclass.forEach((item, idx) => {
+    const chip = el("div", {class:"chip"});
+    const label = typeof item === "string" ? item : (Object.keys(item)[0] + ": " + Object.values(item)[0]);
+    chip.append(el("span",{text:label}));
+    chip.append(el("button",{class:"btn small", text:"刪除"},[]));
+    chip.lastChild.addEventListener("click", () => { state.subclass.splice(idx,1); renderList(); updatePreview(); });
+    sc.append(chip);
+  });
+
+  // pKa
+  const pk = $("#pkaList"); pk.innerHTML = "";
+  state.pKa.forEach((num, idx) => {
+    const chip = el("div",{class:"chip"});
+    chip.append(el("span",{text:String(num)}));
+    chip.append(el("button",{class:"btn small", text:"刪除"}));
+    chip.lastChild.addEventListener("click", () => { state.pKa.splice(idx,1); renderList(); updatePreview(); });
+    pk.append(chip);
+  });
+
+  // indications
+  const il = $("#indicationsList"); il.innerHTML = "";
+  state.indications.forEach((s, idx) => {
+    const chip = el("div",{class:"chip"});
+    chip.append(el("span",{text:s}));
+    chip.append(el("button",{class:"btn small", text:"刪除"}));
+    chip.lastChild.addEventListener("click", () => { state.indications.splice(idx,1); renderList(); updatePreview(); });
+    il.append(chip);
+  });
+
+  // frequency
+  const fl = $("#freqList"); fl.innerHTML = "";
+  state.frequency.forEach((f, idx) => {
+    const row = el("div",{class:"chip"});
+    row.append(el("span",{text:`${f.route}: ${f.value}`}));
+    const del = el("button",{class:"btn small", text:"刪除"});
+    del.addEventListener("click", () => { state.frequency.splice(idx,1); renderList(); updatePreview(); });
+    row.append(del);
+    fl.append(row);
+  });
+
+  // side_effect
+  const se = $("#seList"); se.innerHTML = "";
+  state.side_effect.forEach((s, idx) => {
+    const chip = el("div",{class:"chip"});
+    chip.append(el("span",{text:s}));
+    chip.append(el("button",{class:"btn small", text:"刪除"}));
+    chip.lastChild.addEventListener("click", () => { state.side_effect.splice(idx,1); renderList(); updatePreview(); });
+    se.append(chip);
+  });
+
+  // food_interaction
+  const fi = $("#fiList"); fi.innerHTML = "";
+  state.food_interaction.forEach((s, idx) => {
+    const chip = el("div",{class:"chip"});
+    chip.append(el("span",{text:s}));
+    chip.append(el("button",{class:"btn small", text:"刪除"}));
+    chip.lastChild.addEventListener("click", () => { state.food_interaction.splice(idx,1); renderList(); updatePreview(); });
+    fi.append(chip);
+  });
+
+  // drug_interaction
+  const di = $("#diList"); di.innerHTML = "";
+  state.drug_interaction.forEach((d, idx) => {
+    const row = el("div",{class:"chip"});
+    const label = `${d.drug ?? ""}: ${d.desc ?? ""}`;
+    row.append(el("span",{text:label}));
+    const del = el("button",{class:"btn small", text:"刪除"});
+    del.addEventListener("click", () => { state.drug_interaction.splice(idx,1); renderList(); updatePreview(); });
+    di.append(row.appendChild(del));
+  });
+}
+
+function buildObject() {
+  // 基本欄位
+  const obj = {
+    drugbank_id: $("#drugbank_id").value.trim(),
+    local_id: $("#local_id").value.trim(),
+    UNII_id: $("#UNII_id").value.trim(),
+    name: $("#name").value.trim(),
+    created_at: toIsoLocal($("#created_at").value.trim()),
+    updated_at: toIsoLocal($("#updated_at").value.trim()),
+    class: $("#class").value.trim(),
+    subclass: state.subclass.map(x => x), // 原樣輸出
+    pKa: state.pKa.map(Number),
+    indications: state.indications.map(x => x),
+    frequency: state.frequency.map(f => ({ [f.route.trim()]: f.value.trim() })),
+    dosage_PO: [{min: parseFloat($("#poMin").value)}, {max: parseFloat($("#poMax").value)}],
+    dasage_IM: [{min: $("#imMin").value.trim() || "N/A"}, {max: $("#imMax").value.trim() || "N/A"}],
+    dasage_IV: [{min: $("#ivMin").value.trim() || "N/A"}, {max: $("#ivMax").value.trim() || "N/A"}],
+    dasage_SC: [{min: $("#scMin").value.trim() || "N/A"}, {max: $("#scMax").value.trim() || "N/A"}],
+    dosage_unit: $("#dosage_unit").value.trim(),
+    side_effect: state.side_effect.map(x => x),
+    food_interaction: state.food_interaction.map(x => x),
+    drug_interaction: state.drug_interaction.map(d => ({ [d.drug ?? ""]: d.desc ?? "" })),
+    renal_adj: $("#renal_adj").value.trim(),
+    liver_adj: $("#liver_adj").value.trim()
+  };
+  return obj;
+}
+
+function updatePreview() {
+  const obj = buildObject();
+  $("#preview").value = JSON.stringify(obj, null, 4);
+}
+
+// 事件：陣列新增
+$("#addSubclass").addEventListener("click", () => {
+  const t = $("#subclassType").value;
+  const a = $("#subclassA").value.trim();
+  const b = $("#subclassB").value.trim();
+  if (t === "string") {
+    if (!a) return;
+    state.subclass.push(a);
+  } else {
+    if (!a) return; // 鍵名必填
+    state.subclass.push({ [a]: b || "" });
+  }
+  $("#subclassA").value = ""; $("#subclassB").value = "";
+  renderList(); updatePreview();
+});
+
+$("#addPka").addEventListener("click", () => {
+  const v = $("#pkaValue").value;
+  if (v === "") return;
+  state.pKa.push(parseFloat(v));
+  $("#pkaValue").value = "";
+  renderList(); updatePreview();
+});
+
+$("#addIndication").addEventListener("click", () => {
+  const v = $("#indicationInput").value.trim();
+  if (!v) return;
+  state.indications.push(v);
+  $("#indicationInput").value = "";
+  renderList(); updatePreview();
+});
+
+$("#addFreq").addEventListener("click", () => {
+  const r = $("#freqRoute").value.trim();
+  const v = $("#freqValue").value.trim();
+  if (!r || !v) return;
+  state.frequency.push({route:r, value:v});
+  $("#freqRoute").value = ""; $("#freqValue").value = "";
+  renderList(); updatePreview();
+});
+
+$("#addSE").addEventListener("click", () => {
+  const v = $("#seInput").value.trim();
+  if (!v) return;
+  state.side_effect.push(v);
+  $("#seInput").value = "";
+  renderList(); updatePreview();
+});
+
+$("#addFI").addEventListener("click", () => {
+  const v = $("#fiInput").value.trim();
+  if (!v) return;
+  state.food_interaction.push(v);
+  $("#fiInput").value = "";
+  renderList(); updatePreview();
+});
+
+$("#addDI").addEventListener("click", () => {
+  // 允許空白→變成 {"":""}
+  const drug = $("#diDrug").value.trim();
+  const desc = $("#diDesc").value.trim();
+  state.drug_interaction.push({drug: drug || "", desc: desc || ""});
+  $("#diDrug").value = ""; $("#diDesc").value = "";
+  renderList(); updatePreview();
+});
+
+// 事件：基本欄位即時更新
+[
+  "#drugbank_id","#local_id","#UNII_id","#name","#created_at","#updated_at",
+  "#class","#dosage_unit","#poMin","#poMax",
+  "#imMin","#imMax","#ivMin","#ivMax","#scMin","#scMax",
+  "#renal_adj","#liver_adj"
+].forEach(sel => {
+  $(sel).addEventListener("input", updatePreview);
+});
+
+// 載入範例
+$("#loadSample").addEventListener("click", () => {
+  // 清空陣列
+  state.subclass.length = 0;
+  state.pKa.length = 0;
+  state.indications.length = 0;
+  state.frequency.length = 0;
+  state.side_effect.length = 0;
+  state.food_interaction.length = 0;
+  state.drug_interaction.length = 0;
+
+  // 基本
+  $("#drugbank_id").value = "DB00537";
+  $("#local_id").value = "RBT00003";
+  $("#UNII_id").value  = "5E8K9I0O4U";
+  $("#name").value = "Ciprofloxacin";
+  $("#created_at").value = "2025-09-08T00:30";
+  $("#updated_at").value = "2025-09-08T00:30";
+  $("#class").value = "Antibiotics";
+  $("#dosage_unit").value = "mg/kg";
+
+  // subclass
+  state.subclass.push("Fluoroquinolone Gen2");
+  state.subclass.push({"Spectrum":"Broad"});
+
+  // pKa
+  state.pKa.push(6.09, 8.62);
+
+  // indications
+  ["Nasal pasteurellosis","Pulmonary bacterial infection","Urinary bacterial infection",
+   "Skin bacterial infection","Acute otitis media","Bone and joints bacterial infection"]
+   .forEach(x => state.indications.push(x));
+
+  // frequency
+  state.frequency.push({route:"PO", value:"q24h x 4wk"});
+  state.frequency.push({route:"IM", value:"N/A"});
+  state.frequency.push({route:"IV", value:"N/A"});
+  state.frequency.push({route:"SC", value:"N/A"});
+
+  // 劑量
+  $("#poMin").value = 20; $("#poMax").value = 20;
+  $("#imMin").value = "N/A"; $("#imMax").value = "N/A";
+  $("#ivMin").value = "N/A"; $("#ivMax").value = "N/A";
+  $("#scMin").value = "N/A"; $("#scMax").value = "N/A";
+
+  // 副作用
+  ["Nausea","Vomiting","Crystalluria","Nephrotoxicity","Oliguria","Abdominal pain","Arthropathies in young animals"]
+    .forEach(x => state.side_effect.push(x));
+
+  // 飲食交互
+  ["Avoid dairy products","limit caffeine intake"].forEach(x => state.food_interaction.push(x));
+
+  // 藥物交互
+  [
+    ["Aspirin","CNS side effects"],
+    ["Sulfamethoxazole","rarely arrythmia"],
+    ["Duloxetine","increase the blood levels of Duloxetine, causing Serotonin syndrome"],
+    ["Apixaban","Bleeding"],
+    ["Fluticasone nasal","hypercortisolism"],
+    ["Atorvastatin","Liver damage and Skeletal muscle toxicity, causing secondary renal failure"],
+    ["Polyethylene glycol 3350","arrhythmia"],
+    ["Hydrocodone","increase the blood levels of hydrocodone"],
+    ["Levothyroxine","decrease the effects of Levothyroxine"],
+    ["Ondansetron","arrythmia"],
+    ["Sertraline","arrythmia"],
+    ["",""],
+    ["",""]
+  ].forEach(([drug,desc]) => state.drug_interaction.push({drug, desc}));
+
+  $("#renal_adj").value = "N/A";
+  $("#liver_adj").value = "Not recommended for patients with hepatic disease";
+
+  renderList(); updatePreview();
+});
+
+// 清空
+$("#clearAll").addEventListener("click", () => {
+  document.querySelectorAll("input").forEach(i => { if (i.type!=="button") i.value=""; });
+  Object.keys(state).forEach(k => state[k].length = 0);
+  renderList(); updatePreview();
+});
+
+// 下載
+$("#downloadJson").addEventListener("click", () => {
+  const obj = buildObject();
+  const blob = new Blob([JSON.stringify(obj, null, 4)], {type:"application/json;charset=utf-8"});
+  const name = ($("#name").value.trim() || "drug") + ".json";
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  URL.revokeObjectURL(a.href);
+  a.remove();
+});
+
+// 初始化
+renderList(); updatePreview();
+</script>
+</body>
+</html>

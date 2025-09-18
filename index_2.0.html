@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="zh-Hans-TW">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1" /><!--寬度=裝置寬度, 初始畫面比例預設為1(100%)-->
+        <title>口服藥物紀錄系統</title>
+        <style>
+            /*全域顏色設定*/
+            :root {
+                --fg:#000000;       /*主要字體色彩*/
+                --muted:#3e4044;    /*次要文字色彩*/
+                --line:#b3b3b3;     /*欄邊界線*/
+                --accent:#c49977;   /*主按鈕色彩*/
+                --bg:#ffffff;       /*主背景色*/
+                --soft:#d8d7d7;     /*次要背景色*/
+                --warn:#ec7b3a;     /*警告色*/
+                --danger:#c73a3a;   /*危險, 錯誤色*/
+                --ok:#9cc451;       /*操作成功*/
+            }
+            * { box-sizing: border-box; } /*接下來設定的元素尺寸是整體的大小，padding, content, border總和固定，不須個別計算*/
+            body { 
+                font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,Helvetica,sans-serif; 
+                color:var(--fg); 
+                margin:24px; 
+                background:var(--bg);
+                line-height:1.5;
+                -webkit-text-size-adjust:100%; 
+            }
+            h1 { margin: 0 0 8px;} /*設定了上邊距0, 左右邊距0, 下邊距8*/
+            h2 { margin: 24px 0 8px; } /*設定了上邊距24, 左右邊距0, 下邊距8*/
+            fieldset { 
+                border:1px solid var(--line); /*邊界線寬1px 實線(solid) 顏色與--line相同*/
+                padding:16px;  /*內距16px*/
+                border-radius:12px; /*原角半徑*/
+                margin:16px 0; /*外距 上下16px 左右0px*/
+            } 
+            legend { padding:0 6px; color:var(--muted);} /*fieldset內的字體*/
+            label {display:block; font-size:14px; color: var(--muted); margin:6px 0 4px;}
+            input[type="text"], input[type="number"], input[type="datetime-local"], select, textarea {
+            width:100%; padding:10px; border:1px solid var(--line); border-radius:10px; font-size:14px; background: #fff;
+            }
+            textarea { min-height: 120px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
+            #preview{
+                font-family: "Noto Sans TC", "Microsoft JhengHei", system-ui, -apple-system, Segoe UI, Roboto, Arial, Helvetica, sans-serif;
+                font-size: 16px;        /* 字體大小 */
+                line-height: 1.7;       /* 行距 */
+                letter-spacing: 0.2px;  /* 字距（可選） */
+            }
+            .row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+            .row-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+            .chipbar { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+            .chip { display:flex; gap:8px; align-items:center; background:var(--soft); border:1px solid var(--line); padding:8px; border-radius:10px; }
+            .btn { padding:10px 14px; border-radius:10px; border:1px solid var(--line); background:white; cursor:pointer; }
+            .btn.primary { background:var(--accent); color:white; border-color:var(--accent); }
+            .btn.ghost { background:var(--soft); }
+            .btn.small { padding:6px 8px; font-size:12px; }
+            .toolbar { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom: 10px; }
+            .grid { display:grid; grid-template-columns:1fr; gap:12px; }
+            .flex { display:flex; gap:8px; align-items:center;}
+            .hint { font-size:11px; color:var(--muted); }
+            #preview { width:100%; min-height:240px; }
+            #dropZone { border:2px dashed var(--line); border-radius:12px; padding:16px; background: #fcfdff; display:flex; justify-content:space-between; align-items:center; gap:12px; }
+            #dropZone.dragover { border-color: var(--accent); background:#eef2ff; }
+            .status { font-size: 13px; }
+            .status.ok { color: var(--ok); }
+            .status.warn { color: var(--warn); }
+            .status.err { color: var(--danger); }
+        </style>
+    </head>
+            
+    <body>
+        <h1>口服藥物紀錄系統</h1>
+        <p class="hint">提供可視化藥物用量總覽</p>
+        <div class="toolbar" style="margin-top:12px";>
+            <button class="btn" id="downloadlist">輸出藥物列表</button>
+            <button class="btn" id="printDoc">列印 / 匯出 PDF</button>
+            <button class="btn" id="clearAll">清空表單</button>
+        </div>
+        <!--基本資訊-->
+        <fieldset>
+            <legend>基本資訊</legend>
+            <div class="row"> <!--可限制兩個輸入格位於一列-->
+                <div>
+                    <label for="drName">主治名稱</label>
+                    <input id="drName" type="text" placeholder="例 王饅頭" />
+                </div>
+                <div>
+                    <label for="medrecord_id">病歷編號</label>
+                    <input id="medrecord_id" type="text" placeholder="例 00001" />
+                </div>                
+            </div>
+            <div class="row"> 
+                <div>
+                    <label for="patientName">患者名稱</label>
+                    <input id="patientName" type="text" placeholder="例 饅頭" />
+                </div>
+                <div>
+                    <label for="species">物種</label>
+                    <input id="species" type="text" placeholder="例 兔子" />
+                </div>                
+            </div>
+            <div class="row">
+                <div>
+                    <label for="weight">體重(kg)</label>
+                    <input id="weight" type="number" placeholder="例 50" />
+                </div>
+                <div>
+                    <label for="age">年齡(year-old)</label>
+                    <input id="age" type="number" placeholder="例 99" />
+                </div>
+            </div>
+            <div class="row">
+                <div>
+                    <label for="sex">性別</label>
+                        <select id="sex" name="sex">
+                            <option value="未知">未知</option>
+                            <option value="公">公</option>
+                            <option value="母">母</option>
+                        </select>
+                </div>
+                <div>
+                    <label for="castration">是否絕育</label>
+                        <select id="castration" name="castration">
+                            <option value="未知">未知</option>
+                            <option value="已絕育">已絕育</option>
+                            <option value="未絕育">未絕育</option>
+                        </select>
+                </div>
+            </div>
+            
+        </fieldset>
+        <!--醫囑 頻率-->
+        <fieldset>
+            <legend>醫囑資訊</legend>
+            <div class="row">
+                <div>
+                    <label for="frequency">服用頻率</label>
+                    <select id="frequency" name="frequency">
+                        <option value="PRN">需要時使用</option>    
+                        <option value=1>每日一次</option>
+                        <option value=2>每日二次</option>
+                        <option value=3>每日三次</option>
+                        <option value=4>每日四次</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="psc_day">療程天數 <span class="hint">若選[需要時使用]，輸入總份數即可</span></label>
+                    <input id="psc_day" type="number" placeholder="例 5" />
+                </div>
+            </div>
+            <div class="row">
+                <div>
+                    <label for="come_at">就診時間<span class="hint">（YYYY-MM-DDTHH:mm，自動補秒）</span></label>
+                    <input id="come_at" type="datetime-local" /><!--type="datetime-local"可以拖出時間表選時間-->
+                </div>
+                <div>
+                    <label for="prescribe_at">開立時間</label>
+                    <input id="prescribe_at" type="datetime-local" />
+                </div>
+            </div>
+        </fieldset>
+        <!--藥物清單 藥名 使用劑量 單位劑量 -->
+        <fieldset>
+            <legend>開立藥物清單</legend>
+            <div class="chipbar" id="drugList"></div>
+            <div class="row">
+                <div>
+                    <label for="drugName">藥物名稱</label>
+                    <input id="drugName" type="text" placeholder="例 Acetaminophen"/>
+                </div>
+                <div>
+                    <label for="drugForm">劑型</label>
+                    <select id="drugForm">
+                        <option value="pill">錠／膠囊（mg/顆）</option>
+                        <option value="liquid">懸液／糖漿（mg/mL）</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row">
+                <div>
+                    <label for="drugUnit" id="drugUnitLabel">單位劑量（mg/顆）</label>
+                    <input id="drugUnit" type="number" placeholder="例 250"/>
+                </div>
+                <div>
+                    <label for="drugDose">單次療程劑量（mg/kg）</label>
+                    <input id="drugDose" type="number" placeholder="例 10"/>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="flex" style="margin-top:28px;">
+                    <button class="btn" id="addDrug" type="button">新增藥物</button>
+                </div>
+            </div>
+        </fieldset>
+        <!--處方預覽-->
+        <fieldset>
+            <legend>處方預覽</legend>
+            <textarea id="preview" readonly> </textarea>
+            <p class="hint">＊每次修改會即時更新預覽與下載內容。所有處理皆在本機瀏覽器完成，不會上傳。</p>
+        </fieldset>
+        <script>
+            /* ---------- 工具 ---------- */
+            const $ = sel => document.querySelector(sel);
+            const el = (tag, attrs={}, children=[]) => {
+                const n = document.createElement(tag);
+                for (const [k,v] of Object.entries(attrs)) {
+                    if (k === "class") n.className = v;
+                    else if (k === "text") n.textContent = v;
+                    else n.setAttribute(k, v);
+                }
+                children.forEach(c => n.appendChild(c));
+                return n;
+            };
+            const getVal = (sel) => (document.querySelector(sel)?.value ?? "").trim();
+            const fmtDt = v => v ? v.replace("T"," ").slice(0,16) : "";
+
+            /* ---------- 將頻率值轉中文、轉次數 ---------- */
+            const freqText = (v) => v==="PRN" ? "需要時使用" :
+            ({1:"每日一次",2:"每日二次",3:"每日三次",4:"每日四次"}[String(v)] ?? String(v));
+
+            const freqTimesPerDay = (v) => v==="PRN" ? null : Number(v)||0;
+
+            /* ---------- 狀態 ---------- */
+            const state = {
+            drugs: [] // 每筆 { name, form:'pill'|'liquid', unit:mgPerUnitOrMl, dose:mgPerKg }
+            };
+
+            /* ---------- 劑型切換：單位標籤同步 ---------- */
+            function syncUnitLabel() {
+            const form = $("#drugForm").value;
+            $("#drugUnitLabel").textContent = (form === "liquid")
+                ? "濃度（mg/mL）"
+                : "單位劑量（mg/顆）";
+            $("#drugUnit").placeholder = (form === "liquid") ? "例 250（表示 250 mg/mL）" : "例 250（表示 250 mg/顆）";
+            }
+
+            /* ---------- 計算每藥品的劑量、顆數／mL ---------- */
+            function computeDrugAmount(d) {
+            const weight = Number(getVal("#weight"));
+            const freqVal = getVal("#frequency");
+            const daysOrPortions = Number(getVal("#psc_day")); // PRN 用作「總份數」
+
+            if (!weight || !d.dose || !d.unit) {
+                return { ok:false };
+            }
+
+            // 單次所需 mg
+            const perDoseMg = weight * d.dose; // mg/kg × kg
+            // 單次「顆數／mL」
+            const perDoseUnit = perDoseMg / d.unit;
+
+            // 總劑次
+            let totalDoses = 0;
+            if (freqVal === "PRN") {
+                totalDoses = (Number.isFinite(daysOrPortions) && daysOrPortions>0) ? daysOrPortions : 0;
+            } else {
+                const times = freqTimesPerDay(freqVal);
+                const days  = Number(getVal("#psc_day")) || 0;
+                totalDoses = (times && days) ? times * days : 0;
+            }
+
+            const totalUnit = perDoseUnit * totalDoses;
+
+            return {
+                ok: true,
+                perDoseMg,            // mg
+                perDoseUnit,          // 顆 或 mL
+                totalDoses,           // 總劑次
+                totalUnit             // 總顆／總 mL
+            };
+            }
+
+            /* ---------- 渲染 chip 列表（含每次與總量） ---------- */
+            function renderDrugs() {
+            const box = $("#drugList");
+            box.innerHTML = "";
+
+            state.drugs.forEach((d, idx) => {
+                const calc = computeDrugAmount(d);
+                const unitTag = (d.form === "liquid") ? "mL" : "顆";
+                let subtitle;
+
+                if (calc.ok && calc.totalDoses>0) {
+                subtitle =
+                    `每次：${(calc.perDoseUnit).toFixed(2)} ${unitTag}（≈ ${calc.perDoseMg.toFixed(0)} mg）` +
+                    `，總量：${(calc.totalUnit).toFixed(2)} ${unitTag}（共 ${calc.totalDoses} 次）`;
+                } else if (calc.ok) {
+                subtitle =
+                    `每次：${(calc.perDoseUnit).toFixed(2)} ${unitTag}（≈ ${calc.perDoseMg.toFixed(0)} mg）` +
+                    `，總量：—（請填體重、頻率與天數/份數）`;
+                } else {
+                subtitle = `—（請填體重、單次劑量、${d.form==="liquid"?"濃度":"單位劑量"}）`;
+                }
+
+                const title = (d.form === "liquid")
+                ? `${d.name} [${d.unit} mg/mL]  ${d.dose} mg/kg`
+                : `${d.name} [${d.unit} mg/顆]  ${d.dose} mg/kg`;
+
+                const chip  = el("div", { class:"chip" }, [
+                el("div", {}, [
+                    el("div", { text: title }),
+                    el("div", { text: subtitle, class:"hint" })
+                ]),
+                el("button", { class:"btn small", text:"刪除", "data-idx": String(idx) })
+                ]);
+                box.appendChild(chip);
+            });
+
+            // 綁定刪除
+            box.querySelectorAll("button[data-idx]").forEach(btn => {
+                btn.addEventListener("click", (e) => {
+                const i = Number(e.currentTarget.dataset.idx);
+                state.drugs.splice(i, 1);
+                renderDrugs();
+                updatePreview();
+                });
+            });
+            }
+
+            /* ---------- 新增藥物 ---------- */
+            function addDrug() {
+            const name = $("#drugName").value.trim();
+            const form = $("#drugForm").value; // pill | liquid
+            const unit = $("#drugUnit").value.trim(); // mg/顆 或 mg/mL
+            const dose = $("#drugDose").value.trim(); // mg/kg
+
+            if (!name) { alert("請輸入藥物名稱"); return; }
+            if (unit === "" || isNaN(Number(unit))) { alert("請輸入數字的單位劑量（錠：mg/顆；液：mg/mL）"); return; }
+            if (dose === "" || isNaN(Number(dose))) { alert("請輸入數字的單次劑量（mg/kg）"); return; }
+
+            state.drugs.push({ name, form, unit: Number(unit), dose: Number(dose) });
+
+            // 清空並聚焦
+            $("#drugName").value = "";
+            $("#drugUnit").value = "";
+            $("#drugDose").value = "";
+            $("#drugName").focus();
+
+            renderDrugs();
+            updatePreview();
+            }
+
+            /* ---------- 預覽文字 ---------- */
+            function buildPreviewText() {
+            const drName       = getVal("#drName");
+            const medrecord_id = getVal("#medrecord_id");
+            const patientName  = getVal("#patientName");
+            const species      = getVal("#species");
+            const weight       = getVal("#weight");
+            const age          = getVal("#age");
+            const sex          = getVal("#sex");
+            const castration   = getVal("#castration");
+
+            const frequency    = getVal("#frequency");
+            const psc_day      = getVal("#psc_day");
+            const come_at      = fmtDt(getVal("#come_at"));
+            const prescribe_at = fmtDt(getVal("#prescribe_at"));
+
+            const drugLines = state.drugs.length
+                ? state.drugs.map((d, i) => {
+                    const calc = computeDrugAmount(d);
+                    const unitTag = (d.form === "liquid") ? "mL" : "顆";
+                    const base = `${i+1}. ${d.name} [${d.unit} mg/${d.form==="liquid"?"mL":"顆"}]  ${d.dose} mg/kg`;
+                    if (calc.ok) {
+                    const per = `每次 ≈ ${calc.perDoseUnit.toFixed(2)} ${unitTag}（~${calc.perDoseMg.toFixed(0)} mg）`;
+                    const tot = (calc.totalDoses>0)
+                        ? `；總量 ≈ ${calc.totalUnit.toFixed(2)} ${unitTag}（共 ${calc.totalDoses} 次）`
+                        : `；總量 －（請補齊體重／頻率／天數或份數）`;
+                    return `  ${base}\n     ${per}${tot}`;
+                    } else {
+                    return `  ${base}\n     －（請補齊體重／單次劑量／單位劑量）`;
+                    }
+                }).join("\n")
+                : "  （尚未新增藥物）";
+
+            return [
+                "【基本資訊】",
+                `主治名稱：${drName || "－"}   病歷編號：${medrecord_id || "－"}`,
+                `患者：${patientName || "－"}   物種：${species || "－"}`,
+                `體重(kg)：${weight || "－"}   年齡：${age || "－"}`,
+                `性別：${sex || "－"}   絕育：${castration || "－"}`,
+                "",
+                "【醫囑】",
+                `服用頻率：${freqText(frequency)}`,
+                `療程天數/總份數：${psc_day || "－"}`,
+                `就診時間：${come_at || "－"}`,
+                `開立時間：${prescribe_at || "－"}`,
+                "",
+                "【開立藥物清單與配製總量】",
+                drugLines
+            ].join("\n");
+            }
+
+            /* ---------- 寫入預覽 ---------- */
+            function updatePreview() {
+            const ta = $("#preview");
+            if (ta) ta.value = buildPreviewText();
+            }
+
+            /* ---------- 事件 ---------- */
+            $("#drugForm").addEventListener("change", syncUnitLabel);
+            $("#addDrug").addEventListener("click", addDrug);
+
+
+            // Enter 直接新增
+            ["#drugName", "#drugUnit", "#drugDose"].forEach(sel => {
+            $(sel).addEventListener("keydown", (e) => {
+                if (e.key === "Enter") { e.preventDefault(); addDrug(); }
+            });
+            });
+
+            // 表單任一欄位變動就更新預覽與 chip
+            document.querySelectorAll("input, select, textarea").forEach(el => {
+            el.addEventListener("input", () => { renderDrugs(); updatePreview(); });
+            el.addEventListener("change", () => { renderDrugs(); updatePreview(); });
+            });
+
+            /* ---------- 初始 ---------- */
+            syncUnitLabel();
+            renderDrugs();
+            updatePreview();    
+            
+            /* ====== 匯出 / 列印工具 ====== */
+            // 建議的安全檔名（移除奇怪字元，保留中文與數字字母）
+            function safeSlug(s) {
+            if (!s) return "NA";
+            try { s = s.normalize("NFKD"); } catch(e){}
+            // 去除附加符號
+            s = s.replace(/[\u0300-\u036f]/g, "");
+            // 保留中文字、英文數字、底線、連字號
+            return s.replace(/[^\w\u4e00-\u9fff\-]+/g, "_").replace(/^_+|_+$/g,"").slice(0, 40) || "NA";
+            }
+
+            // 檔名：患者_病歷_YYYYMMDD-HHmm.ext
+            function makeFilename(ext) {
+            const name = safeSlug(getVal("#patientName"));
+            const mrn  = safeSlug(getVal("#medrecord_id"));
+            const d = new Date();
+            const y = d.getFullYear();
+            const m = String(d.getMonth()+1).padStart(2,"0");
+            const day = String(d.getDate()).padStart(2,"0");
+            const hh = String(d.getHours()).padStart(2,"0");
+            const mm = String(d.getMinutes()).padStart(2,"0");
+            return `${name}_${mrn}_${y}${m}${day}-${hh}${mm}.${ext}`;
+            }
+
+            // 下載任意文字檔
+            function downloadTextFile(filename, content, mime="text/plain;charset=utf-8") {
+            const blob = new Blob([content], { type: mime });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+            }
+
+            // buildPrintableHTML()：移除內嵌 <script> 的版本
+            function buildPrintableHTML(previewText) {
+            const escape = s => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+            const title = "口服藥物紀錄";
+            const body = escape(previewText);
+            const now = new Date().toLocaleString();
+            return `<!DOCTYPE html>
+            <html lang="zh-Hant">
+            <head> ...（同前略）... </head>
+            <body>
+            <h1>口服藥物紀錄</h1>
+            <div class="meta">${now}</div>
+            <pre>${body}</pre>
+            </body>
+            </html>`;
+            }
+
+            // 列印 / 匯出 PDF
+            $("#printDoc").addEventListener("click", () => {
+            const html = buildPrintableHTML(buildPreviewText());
+            const w = window.open("", "_blank");
+            if (!w) { alert("彈出視窗被阻擋，請允許開啟新視窗再試一次。"); return; }
+            w.document.open("text/html");
+            w.document.write(html);
+            w.document.close();
+            // 等新文件載入完成再列印
+            w.onload = () => w.print();
+            });
+            /* ====== 綁定按鈕 ====== */
+
+            // 下載 TXT（用預覽文字）
+            $("#downloadlist").addEventListener("click", () => {
+            const txt = buildPreviewText();                   // 你前面已經實作的函式
+            const filename = makeFilename("txt");
+            // Windows 友善：加 CRLF
+            downloadTextFile(filename, txt.replace(/\n/g, "\r\n"));
+            });
+
+            // 列印 / 匯出 PDF（開新視窗，乾淨版面，自動呼叫列印）
+            $("#printDoc").addEventListener("click", () => {
+            const html = buildPrintableHTML(buildPreviewText());
+            const w = window.open("", "_blank");
+            if (!w) { alert("彈出視窗被阻擋，請允許這個網站開啟新視窗再試一次。"); return; }
+            w.document.open();
+            w.document.write(html);
+            w.document.close();
+            w.focus();
+            });
+
+            //清空表單
+            // 建議：用容器範圍（如整個 <body> 或某個 <fieldset>）
+            const SCOPE = document; // 你也可以改成 $("#myForm") 之類的容器
+
+            function clearAllFields(scope = SCOPE) {
+            // 1) 清空所有可輸入欄位：text/number/datetime-local/textarea
+            scope.querySelectorAll('input:not([type="button"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]), textarea')
+                .forEach(el => { el.value = ""; });
+
+            // 2) select 回到第一個選項
+            scope.querySelectorAll("select").forEach(sel => { sel.selectedIndex = 0; });
+
+            // 3) checkbox / radio 取消勾選（如有預設，再自行設定）
+            scope.querySelectorAll('input[type="checkbox"], input[type="radio"]').forEach(el => { el.checked = false; });
+
+            // 4) 若有 file 欄位，需用替換節點方式重置（瀏覽器不允許直接設值）
+            scope.querySelectorAll('input[type="file"]').forEach(fileInput => {
+                const clone = fileInput.cloneNode(true);
+                fileInput.replaceWith(clone);
+            });
+            }
+
+            function resetState() {
+            // 依你目前的狀態結構
+            if (window.state && Array.isArray(state.drugs)) state.drugs.length = 0;
+            }
+
+            $("#clearAll")?.addEventListener("click", () => {
+            // 清欄位
+            clearAllFields();
+
+            // 特殊欄位的預設值
+            $("#lockCreated") && ($("#lockCreated").checked = true);
+            $("#extrasBox") && ($("#extrasBox").value = "{}");
+
+            // 清內部狀態＋重繪
+            resetState();          // 取代 resetArrays()
+            if (typeof renderDrugs === "function") renderDrugs();   // 取代 renderList()
+            if (typeof updatePreview === "function") updatePreview();
+
+            // 狀態訊息
+            if ($("#dropStatus")) {
+                $("#dropStatus").textContent = "已清空";
+                $("#dropStatus").classList.remove("ok", "warn", "err");
+                $("#dropStatus").classList.add("status");
+            }
+            });
+
+        </script>
+    </body>
+
+</html>

@@ -1,0 +1,130 @@
+{
+    "drugbank_id": "DB00537",
+    "local_id": "RBT00003",
+    "UNII_id": "5E8K9I0O4U",
+    "name": "Ciprofloxacin",
+    "created_at": "2025-09-08T00:30:00",
+    "updated_at": "2025-09-10T00:34:00",
+    "class": "Antibiotics",
+    "subclass": [
+        "Fluoroquinolone Gen2",
+        {
+            "Spectrum": "Broad"
+        }
+    ],
+    "pKa": [
+        6.09,
+        8.62
+    ],
+    "indications": [
+        "Nasal pasteurellosis",
+        "Pulmonary bacterial infection",
+        "Urinary bacterial infection",
+        "Skin bacterial infection",
+        "Acute otitis media",
+        "Bone and joints bacterial infection"
+    ],
+    "frequency": [
+        {
+            "PO": "q24h x 4wk"
+        },
+        {
+            "IM": "N/A"
+        },
+        {
+            "IV": "N/A"
+        },
+        {
+            "SC": "N/A"
+        }
+    ],
+    "dosage_PO": [
+        {
+            "min": 20
+        },
+        {
+            "max": 20
+        }
+    ],
+    "dasage_IM": [
+        {
+            "min": "N/A"
+        },
+        {
+            "max": "N/A"
+        }
+    ],
+    "dasage_IV": [
+        {
+            "min": "N/A"
+        },
+        {
+            "max": "N/A"
+        }
+    ],
+    "dasage_SC": [
+        {
+            "min": "N/A"
+        },
+        {
+            "max": "N/A"
+        }
+    ],
+    "dosage_unit": "mg/kg",
+    "side_effect": [
+        "Nausea",
+        "Vomiting",
+        "Crystalluria",
+        "Nephrotoxicity",
+        "Oliguria",
+        "Abdominal pain",
+        "Arthropathies in young animals"
+    ],
+    "food_interaction": [
+        "Avoid dairy products",
+        "limit caffeine intake"
+    ],
+    "drug_interaction": [
+        {
+            "Aspirin": "CNS side effects"
+        },
+        {
+            "Sulfamethoxazole": "rarely arrythmia"
+        },
+        {
+            "Duloxetine": "increase the blood levels of Duloxetine, causing Serotonin syndrome"
+        },
+        {
+            "Apixaban": "Bleeding"
+        },
+        {
+            "Fluticasone nasal": "hypercortisolism"
+        },
+        {
+            "Atorvastatin": "Liver damage and Skeletal muscle toxicity, causing secondary renal failure"
+        },
+        {
+            "Polyethylene glycol 3350": "arrhythmia"
+        },
+        {
+            "Hydrocodone": "increase the blood levels of hydrocodone"
+        },
+        {
+            "Levothyroxine": "decrease the effects of Levothyroxine"
+        },
+        {
+            "Ondansetron": "arrythmia"
+        },
+        {
+            "Sertraline": "arrythmia"
+        },
+        {
+            "": ""
+        },
+        {
+            "": ""
+        }
+    ],
+    "renal_adj": "",
+    "liver_adj": ""
+}

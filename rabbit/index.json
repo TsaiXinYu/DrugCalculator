@@ -1,0 +1,42 @@
+{
+  "by_local_id": {
+    "RBT00001": "data/RBT00001_Azithromycin_2025-09-07T22_46.json",
+    "RBT00002": "data/RBT00002_Chloramphenicol_2025-09-07T23_41.json",
+    "RBT00003": "data/RBT00003_Ciprofloxacin_2025-09-08T00_30.json",
+    "RBT00004": "data/RBT00004_Chlortetracycline_2025-09-09T21_41.json",
+    "RBT00005": "data/RBT00005_Doxycycline_2025-09-09T22_22.json"
+  },
+  "by_name": {
+    "azithromycin": [
+      "RBT00001"
+    ],
+    "rbt00001": [
+      "RBT00001"
+    ],
+    "chloramphenicol": [
+      "RBT00002"
+    ],
+    "rbt00002": [
+      "RBT00002"
+    ],
+    "ciprofloxacin": [
+      "RBT00003"
+    ],
+    "rbt00003": [
+      "RBT00003"
+    ],
+    "chlortetracycline": [
+      "RBT00004"
+    ],
+    "rbt00004": [
+      "RBT00004"
+    ],
+    "doxycycline": [
+      "RBT00005"
+    ],
+    "rbt00005": [
+      "RBT00005"
+    ]
+  },
+  "updated_at": "2025-09-09T16:36:54"
+}
